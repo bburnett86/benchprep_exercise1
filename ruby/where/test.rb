@@ -1,6 +1,37 @@
 require 'minitest/autorun'
 
+class Array
+
+  def where(hash = {})
+
+    hash_keys = hash.keys
+    hash_values = hash.values
+    answer = []
+    answer = single_solve(hash_keys[0], hash_values[0])
+    if hash.length > 1
+      (hash.length - 1).times do |index|
+        answer = answer.single_solve(hash_keys[index + 1], hash_values[index + 1])
+      end
+    end
+    return answer
+  end
+
+  def single_solve(search_val_1, search_val_2)
+    correct_arr = []
+    self.each do |person|
+      person.each do |k, v|
+        correct_arr << person if search_val_2.is_a?(String) && k == search_val_1 && v == search_val_2
+        correct_arr << person if search_val_2.is_a?(Integer) && k == search_val_1 && v == search_val_2
+        correct_arr << person if search_val_2.is_a?(Regexp) && k == search_val_1 && (v == search_val_2 || search_val_2.match(v) != nil)
+      end
+    end
+    return correct_arr
+  end
+
+end
+
 class WhereTest < Minitest::Test
+
   def setup
     @boris   = {:name => 'Boris The Blade', :quote => "Heavy is good. Heavy is reliable. If it doesn't work you can always hit them.", :title => 'Snatch', :rank => 4}
     @charles = {:name => 'Charles De Mar', :quote => 'Go that way, really fast. If something gets in your way, turn.', :title => 'Better Off Dead', :rank => 3}
@@ -11,7 +42,7 @@ class WhereTest < Minitest::Test
   end
 
   def test_where_with_exact_match
-    assert_equal [@wolf], @fixtures.where(:name => 'The Wolf'),
+    assert_equal [@wolf], @fixtures.where(:name => 'The Wolf')
   end
 
   def test_where_with_partial_match
